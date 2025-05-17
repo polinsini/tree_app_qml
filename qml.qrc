@@ -1,0 +1,11 @@
+<RCC>
+    <qresource prefix="/">
+        <file>main.qml</file>
+        <file>TreeDelegate.qml</file>
+        <file>Line.qml</file>
+        <file>TreeNode.qml</file>
+        <file>123.qml</file>
+        <file>treeData.json</file>
+        <file>TreeData.json</file>
+    </qresource>
+</RCC>
