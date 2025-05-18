@@ -1,4 +1,4 @@
-QT += quick qml widgets
+QT += quick qml core
 
 CONFIG += c++11
 
@@ -8,9 +8,8 @@ CONFIG += c++11
 
 SOURCES += \
         main.cpp \
-        treeitem.cpp \
-        treeloader.cpp \
-        treemodel.cpp
+        treemodel.cpp \
+        treenode.cpp
 
 RESOURCES += qml.qrc
 
@@ -25,9 +24,6 @@ qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
-DISTFILES +=
-
 HEADERS += \
-    treeitem.h \
-    treeloader.h \
-    treemodel.h
+    treemodel.h \
+    treenode.h

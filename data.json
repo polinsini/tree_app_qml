@@ -1,0 +1,13 @@
+{
+  "value": "Root",
+  "left": {
+    "value": "Left",
+    "left": null,
+    "right": null
+  },
+  "right": {
+    "value": "Right",
+    "left": null,
+    "right": null
+  }
+}

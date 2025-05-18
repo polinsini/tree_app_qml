@@ -1,125 +1,94 @@
 import QtQuick 2.0
+import QtQuick.Controls 1.0
+import QtQuick.Dialogs 1.0
 import QtQuick.Window 2.0
-import QtQuick.Dialogs 1.2
-import TreeModel 1.0
 
 Window {
+    visible: true
     width: 800
     height: 600
-    visible: true
-    title: "Главное окно"
+    title: "Tree Viewer"
 
-    TreeModel {
-        id: treeModel
-    }
-
+    // FileDialog для выбора файла
     FileDialog {
         id: fileDialog
-        title: "Выберите JSON-файл"
+        title: "Select Tree JSON File"
         nameFilters: ["JSON files (*.json)"]
         onAccepted: {
-            treeModel.loadFromFile(fileDialog.fileUrl)
+            var url = fileUrl.toString()
+            var path = url.replace("file:///", "")
+            treeModel.loadFromFile(path)
         }
     }
 
-    // Второе окно
+    // Окно для отображения текста
     Window {
-        id: secondWindow
+        id: treeWindow
+        //modal: true
         width: 600
         height: 400
         visible: false
-        title: "Дерево во втором окне"
+        title: "Tree Visualization"
 
-        ListView {
-            anchors.fill: parent
-            model: treeModel
-            delegate: Rectangle {
-                width: parent.width
-                height: 30
-                color: "#BBDEFB"
+        // Загрузка TreeView из файла
+        Loader {
+            id: treeLoader
+            source: "TreeView.qml"
 
-                Text {
-                    text: model.text
-                    font.pixelSize: 12
-                    anchors {
-                        left: parent.left
-                        leftMargin: 20 + (model.level * 20)
-                        verticalCenter: parent.verticalCenter
-                    }
+            onStatusChanged: {
+                if (status === Loader.Error) {
+                    console.error("Loader error:", errorString)
                 }
             }
+
+            onLoaded: {
+                item.width = parent.width
+                item.height = parent.height
+                item.rootNode = treeModel.root
+                console.log("treeModel.root =", treeModel.root)
+                if (item.rootNode) {
+
+                    console.log("TreeView loaded with root node:", treeModel.root)
+                } else {
+                    console.error("Error: treeModel.root is undefined!")
+                }
+                console.log("TreeView loaded")
+
+                treeModel.treeUpdated.connect(function() {
+                                item.rootNode = treeModel.root
+                            })
+            }
+        }
+
+        Button {
+            text: "Close"
+            anchors.bottom: parent.bottom
+            anchors.horizontalCenter: parent.horizontalCenter
+            onClicked: treeWindow.close()
         }
     }
 
-    Column {
-        anchors.fill: parent
-        spacing: 10
 
-        // Кнопка выбора файла
-        Rectangle {
-            width: 150
-            height: 40
-            color: "#4CAF50"
-            radius: 5
+    // Кнопка загрузки файла
+    Button {
+        id: loadButton
+        text: "Load Tree"
+        anchors.top: parent.top
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.topMargin: 20
+        onClicked: fileDialog.open()
+    }
 
-            Text {
-                text: "Выбрать файл"
-                anchors.centerIn: parent
-                color: "white"
-            }
+    // Кнопка отображения дерева
+    Button {
+        id: treeView
+        text: "Show Text"
+        anchors.top: loadButton.bottom
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.topMargin: 20
+        onClicked: {
+            treeWindow.visible = true
 
-            MouseArea {
-                anchors.fill: parent
-                onClicked: fileDialog.open()
-            }
-        }
-
-        // Кнопка открытия второго окна
-        Rectangle {
-            width: 150
-            height: 40
-            color: "#2196F3"
-            radius: 5
-
-            Text {
-                text: "Открыть дерево во втором окне"
-                anchors.centerIn: parent
-                color: "white"
-                font.pixelSize: 10
-            }
-
-            MouseArea {
-                anchors.fill: parent
-                onClicked: {
-                    if (!secondWindow.visible) {
-                        secondWindow.visible = true
-                    } else {
-                        secondWindow.raise() // Если уже открыт — поднять поверх
-                    }
-                }
-            }
-        }
-
-        // Отображение дерева в главном окне
-        ListView {
-            width: parent.width
-            height: parent.height - 100
-            model: treeModel
-            delegate: TreeDelegate {
-                width: parent.width
-                height: 40
-                color: "#E3F2FD"
-
-                Text {
-                    text: model.text
-                    font.pixelSize: 14
-                    anchors {
-                        left: parent.left
-                        leftMargin: 20 + (model.level * 30)
-                        verticalCenter: parent.verticalCenter
-                    }
-                }
-            }
         }
     }
 }
